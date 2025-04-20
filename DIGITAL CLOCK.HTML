@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Digital Clock UI</title>
+  <STYLE>
+    /* Basic Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  background: #000;
+  color: #00ffe7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Clock Container */
+.clock-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.clock {
+  background: rgba(0, 0, 0, 0.8);
+  border: 3px solid #00ffe7;
+  padding: 40px;
+  border-radius: 25px;
+  box-shadow: 0 0 25px #00ffe7;
+  transform: perspective(800px) rotateX(10deg);
+}
+
+.time {
+  font-size: 4rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.time span {
+  padding: 10px 20px;
+  background: #111;
+  border-radius: 12px;
+  box-shadow: 0 0 15px #00ffe7 inset;
+  min-width: 70px;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.flip {
+  animation: flip 0.5s ease;
+}
+
+@keyframes flip {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+
+.date-day {
+  font-size: 1.3rem;
+  margin-top: 10px;
+  text-shadow: 0 0 5px #00ffe7;
+}
+
+.tagline {
+  margin-top: 15px;
+  color: #0ff;
+  font-style: italic;
+  text-shadow: 0 0 10px #00ffe7;
+}
+
+/* Right Buttons */
+.right-buttons {
+  position: fixed;
+  top: 20%;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 100;
+}
+
+.right-buttons button {
+  background: transparent;
+  border: 2px solid #00ffe7;
+  color: #00ffe7;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  text-shadow: 0 0 10px #00ffe7;
+  transition: 0.3s;
+}
+
+.right-buttons button:hover {
+  background: #00ffe7;
+  color: #000;
+  box-shadow: 0 0 20px #00ffe7;
+}
+
+/* Footer */
+footer {
+  position: fixed;
+  bottom: 10px;
+  text-align: center;
+  width: 100%;
+}
+
+.credit {
+  color: #00ffe7;
+  font-weight: bold;
+  text-shadow: 0 0 10px #00ffe7, 0 0 20px #00ffe7;
+}
+
+.credit span {
+  color: #00fff2;
+  font-size: 1.2rem;
+}
+
+  </STYLE>
+</head>
+<body>
+  <div class="clock-container">
+    <div class="clock">
+      <div class="time">
+        <span class="flip" id="hours">00</span> :
+        <span class="flip" id="minutes">00</span> :
+        <span class="flip" id="seconds">00</span>
+        <span id="ampm">AM</span>
+      </div>
+      <div class="date-day">
+        <span id="day">Monday</span>, <span id="date">01 January 2025</span>
+      </div>
+    </div>
+    <p class="tagline">VR Style Digital Clock UI ⏰</p>
+  </div>
+
+  <!-- Right Side Controls -->
+  <div class="right-buttons">
+    <button id="toggleFlip">⏹️ Stop Flip</button>
+    <button id="toggleSound">🔊 Sound On</button>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p class="credit">✨ Credited by <span>Sandhu</span> ✨</p>
+  </footer>
+
+  <!-- Sound File -->
+  <audio id="tickSound" src="tick.mp3" preload="auto"></audio>
+  
+  <!-- Script -->
+   <SCRIPT>
+    const hours = document.getElementById("hours");
+const minutes = document.getElementById("minutes");
+const seconds = document.getElementById("seconds");
+const ampm = document.getElementById("ampm");
+const dayEl = document.getElementById("day");
+const dateEl = document.getElementById("date");
+const tickSound = document.getElementById("tickSound");
+
+const toggleSoundBtn = document.getElementById("toggleSound");
+const toggleFlipBtn = document.getElementById("toggleFlip");
+
+let soundEnabled = true;
+let flipEnabled = true;
+
+function flipEffect(element) {
+  if (!flipEnabled) return;
+  element.classList.remove("flip");
+  void element.offsetWidth;
+  element.classList.add("flip");
+}
+
+function updateClock() {
+  const now = new Date();
+
+  let h = now.getHours();
+  let m = now.getMinutes();
+  let s = now.getSeconds();
+  let ap = h >= 12 ? "PM" : "AM";
+
+  h = h % 12 || 12;
+  h = h < 10 ? "0" + h : h;
+  m = m < 10 ? "0" + m : m;
+  s = s < 10 ? "0" + s : s;
+
+  if (hours.textContent !== h) flipEffect(hours);
+  if (minutes.textContent !== m) flipEffect(minutes);
+  if (seconds.textContent !== s) flipEffect(seconds);
+
+  hours.textContent = h;
+  minutes.textContent = m;
+  seconds.textContent = s;
+  ampm.textContent = ap;
+
+  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const day = days[now.getDay()];
+  const date = now.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit"
+  });
+
+  dayEl.textContent = day;
+  dateEl.textContent = date;
+
+  if (soundEnabled) {
+    tickSound.currentTime = 0;
+    tickSound.play();
+  }
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+toggleSoundBtn.addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  toggleSoundBtn.textContent = soundEnabled ? "🔊 Sound On" : "🔇 Sound Off";
+});
+
+toggleFlipBtn.addEventListener("click", () => {
+  flipEnabled = !flipEnabled;
+  toggleFlipBtn.textContent = flipEnabled ? "⏹️ Stop Flip" : "▶️ Start Flip";
+});
+
+   </SCRIPT>
+</body>
+</html>
